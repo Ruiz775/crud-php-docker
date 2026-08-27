@@ -1,0 +1,52 @@
+# docker-compose.yml
+# ------------------------------------------------------------------------------------
+# Orquestra todo o ambiente do trabalho: a aplicação PHP (serviço "app") e o banco
+# de dados PostgreSQL (serviço "db"). Cada linha está comentada em português, de
+# forma didática, conforme exigido no enunciado.
+#
+# A chave "version:" foi intencionalmente OMITIDA: as versões atuais do Docker
+# Compose (v2 em diante) não a utilizam mais e mostram um aviso quando ela existe.
+# ------------------------------------------------------------------------------------
+
+services:                              # Bloco que declara todos os serviços (containers) do projeto
+
+  app:                                 # Serviço 1: aplicação web em PHP que contém o CRUD
+    build:                             # Em vez de baixar uma imagem pronta, construímos uma a partir de um Dockerfile
+      context: ./app                   # Pasta enviada ao Docker como contexto de build (onde está o Dockerfile)
+      dockerfile: Dockerfile           # Nome do arquivo de build; ele parte da imagem oficial php:8.2-apache
+    container_name: produtos-app       # Nome fixo do container (facilita "docker logs produtos-app", por ex.)
+    restart: unless-stopped            # Reinicia o container automaticamente se ele cair, exceto se for parado à mão
+    ports:                             # Mapeamento de portas entre o host (sua máquina) e o container
+      - "8080:80"                      # Porta 8080 do host -> porta 80 (Apache) do container: http://localhost:8080
+    environment:                       # Variáveis de ambiente lidas pelo código PHP (sem usar arquivo .env)
+      DB_HOST: db                      # Host do banco = nome do serviço "db", resolvido pela rede interna do Compose
+      DB_PORT: 5432                    # Porta padrão do PostgreSQL dentro da rede interna
+      DB_NAME: crud_produtos           # Nome do banco de dados que a aplicação vai usar
+      DB_USER: app_user                # Usuário que o PHP utiliza para se conectar ao banco
+      DB_PASSWORD: app_password        # Senha desse usuário
+    volumes:                           # Compartilhamento de arquivos entre host e container
+      - ./app/src:/var/www/html        # Código PHP do host servido pelo Apache; alterações aparecem na hora
+    depends_on:                        # Ordem de inicialização dos serviços
+      - db                             # O "db" é iniciado antes do "app" (não garante que já esteja "pronto")
+    networks:                          # Redes às quais este container se conecta
+      - rede-crud                      # Liga o "app" à rede personalizada do projeto
+
+  db:                                  # Serviço 2: banco de dados relacional
+    image: postgres:16                 # Imagem OFICIAL do PostgreSQL, versão 16, baixada do Docker Hub
+    container_name: produtos-db        # Nome fixo do container do banco
+    restart: unless-stopped            # Mesma política de reinício automático do serviço "app"
+    environment:                       # Variáveis que a imagem oficial do PostgreSQL usa para se autoconfigurar
+      POSTGRES_DB: crud_produtos       # Cria automaticamente este banco de dados (vazio) no primeiro start
+      POSTGRES_USER: app_user          # Cria este usuário como dono do banco
+      POSTGRES_PASSWORD: app_password  # Define a senha desse usuário
+    volumes:                           # Persistência dos dados do banco
+      - dados-postgres:/var/lib/postgresql/data  # Volume nomeado onde o Postgres grava os dados; sobrevive a "down"
+    networks:                          # Redes deste container
+      - rede-crud                      # Liga o "db" à mesma rede, permitindo que o "app" o encontre pelo nome "db"
+
+volumes:                               # Declaração dos volumes nomeados usados acima
+  dados-postgres:                      # Volume gerenciado pelo Docker para os arquivos do PostgreSQL
+
+networks:                              # Declaração das redes personalizadas
+  rede-crud:                           # Rede isolada, exclusiva dos containers deste projeto
+    driver: bridge                     # Driver "bridge": rede local que resolve os containers pelo nome do serviço
