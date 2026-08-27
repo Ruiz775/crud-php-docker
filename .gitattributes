@@ -1,0 +1,3 @@
+# Mantém sempre quebras de linha LF no repositório e no checkout,
+# evitando que o Docker (Dockerfile) ou o PHP recebam CRLF no Windows.
+* text=auto eol=lf
