@@ -1,0 +1,10 @@
+# Pastas/arquivos de ferramentas e do sistema operacional
+.claude/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Este trabalho NÃO usa arquivo .env (proibido pelo enunciado).
+# A linha abaixo evita que um .env seja versionado por engano.
+.env
