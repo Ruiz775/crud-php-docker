@@ -227,5 +227,6 @@ pela imagem oficial sejam exatamente os que a aplicação espera.
 
 ## 6. Autores
 
-- **Gustavo Ruiz** — <!-- TODO: substituir pelo nome COMPLETO -->
-- **<!-- TODO: nome COMPLETO do(a) colega da dupla -->**
+| Nome             | RA     |
+|------------------|--------|
+| Gustavo Ruiz     | 250417 |
