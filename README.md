@@ -230,5 +230,4 @@ pela imagem oficial sejam exatamente os que a aplicação espera.
 | Nome             | RA     |
 |------------------|--------|
 | Gustavo Ruiz     | 250417 |
-
-*Aluno:* Murilo Marchiori — RA: 14510
+| Murilo Marchiori | 14510  |
