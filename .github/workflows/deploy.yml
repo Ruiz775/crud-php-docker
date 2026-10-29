@@ -1,0 +1,18 @@
+name: Deploy automático
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Subir aplicação atualizada
+        run: docker compose -p crud-php-docker up -d --build
+
+      - name: Mostrar containers
+        run: docker compose -p crud-php-docker ps
